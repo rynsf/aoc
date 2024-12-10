@@ -19,13 +19,14 @@ func outOfBound(x, y int) bool {
 	}
 	return false
 }
+
 func validAppend(pos vec, spots *[]vec) {
 	if pos.x != -1 && pos.y != -1 {
 		*spots = append(*spots, pos)
 	}
 }
 
-func score(x, y, last int, spots *[]vec) vec {
+func traverseAllTracks(x, y, last int, spots *[]vec) vec {
 	if outOfBound(x, y) {
 		return vec{-1, -1}
 	}
@@ -35,15 +36,21 @@ func score(x, y, last int, spots *[]vec) vec {
 	if topoMap[y][x] == 9 {
 		return vec{x, y}
 	}
-	right := score(x+1, y, topoMap[y][x], spots)
-	left := score(x-1, y, topoMap[y][x], spots)
-	top := score(x, y-1, topoMap[y][x], spots)
-	bottom := score(x, y+1, topoMap[y][x], spots)
+	right := traverseAllTracks(x+1, y, topoMap[y][x], spots)
+	left := traverseAllTracks(x-1, y, topoMap[y][x], spots)
+	top := traverseAllTracks(x, y-1, topoMap[y][x], spots)
+	bottom := traverseAllTracks(x, y+1, topoMap[y][x], spots)
 	validAppend(right, spots)
 	validAppend(left, spots)
 	validAppend(top, spots)
 	validAppend(bottom, spots)
 	return vec{-1, -1}
+}
+
+func score(x, y int) int {
+	spots := make([]vec, 0)
+	traverseAllTracks(x, y, -1, &spots)
+	return len(spots)
 }
 
 func main() {
@@ -69,9 +76,7 @@ func main() {
 	for y, l := range topoMap {
 		for x, spot := range l {
 			if spot == 0 {
-				spots := make([]vec, 0)
-				score(x, y, -1, &spots)
-				result += len(spots)
+				result += score(x, y)
 			}
 		}
 	}

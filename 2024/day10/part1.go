@@ -37,7 +37,7 @@ func validAppend(pos vec, spots *[]vec) {
 	}
 }
 
-func score(x, y, last int, spots *[]vec) vec {
+func traverseAllTracks(x, y, last int, spots *[]vec) vec {
 	if outOfBound(x, y) {
 		return vec{-1, -1}
 	}
@@ -47,10 +47,10 @@ func score(x, y, last int, spots *[]vec) vec {
 	if topoMap[y][x] == 9 {
 		return vec{x, y}
 	}
-	right := score(x+1, y, topoMap[y][x], spots)
-	left := score(x-1, y, topoMap[y][x], spots)
-	top := score(x, y-1, topoMap[y][x], spots)
-	bottom := score(x, y+1, topoMap[y][x], spots)
+	right := traverseAllTracks(x+1, y, topoMap[y][x], spots)
+	left := traverseAllTracks(x-1, y, topoMap[y][x], spots)
+	top := traverseAllTracks(x, y-1, topoMap[y][x], spots)
+	bottom := traverseAllTracks(x, y+1, topoMap[y][x], spots)
 	validAppend(right, spots)
 	validAppend(left, spots)
 	validAppend(top, spots)
@@ -58,8 +58,13 @@ func score(x, y, last int, spots *[]vec) vec {
 	return vec{-1, -1}
 }
 
+func score(x, y int) int {
+	spots := make([]vec, 0)
+	traverseAllTracks(x, y, -1, &spots)
+	return len(spots)
+}
+
 func main() {
-	fmt.Println("Hello World")
 	f, err := os.Open("./input")
 	if err != nil {
 		panic(err)
@@ -82,9 +87,7 @@ func main() {
 	for y, l := range topoMap {
 		for x, spot := range l {
 			if spot == 0 {
-				spots := make([]vec, 0)
-				score(x, y, -1, &spots)
-				result += len(spots)
+				result += score(x, y)
 			}
 		}
 	}
