@@ -13,6 +13,10 @@ type operations struct {
 	num  int
 }
 
+func mod(x, y int) int {
+	return (x%y + y) % y
+}
+
 func main() {
 	file, err := os.Open("./input")
 	if err != nil {
@@ -28,7 +32,6 @@ func main() {
 	for sc.Scan() {
 		sign := 1
 		line := sc.Text()
-		fmt.Println(line)
 
 		if line[0] == 'L' {
 			sign = -1
@@ -49,14 +52,7 @@ func main() {
 	passwd := 0
 	for _, o := range ops {
 		for i := 0; i < o.num; i++ {
-			dial += o.sign
-
-			switch dial {
-			case 100:
-				dial = 0
-			case -1:
-				dial = 99
-			}
+			dial = mod(dial+o.sign, 100)
 
 			if dial == 0 {
 				passwd += 1
